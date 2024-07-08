@@ -1,5 +1,5 @@
 import { ref, onMounted } from "vue";
-
+import { getCaptcha } from "@/api/api";
 /**
  * 绘制图形验证码
  * @param width - 图形宽度
@@ -15,7 +15,19 @@ export const useImageVerify = (width = 120, height = 40) => {
 
   function getImgCode() {
     if (!domRef.value) return;
-    imgCode.value = draw(domRef.value, width, height);
+    // imgCode.value = draw(domRef.value, width, height);
+    getCaptcha().then(res => {
+      console.log(res, "getImgCode");
+
+      const ctx = domRef.value.getContext("2d");
+      if (!ctx) return imgCode;
+      var image = new Image();
+      image.src = res.data.captcha;
+
+      image.onload = function () {
+        ctx.drawImage(image, 0, 0);
+      };
+    });
   }
 
   onMounted(() => {

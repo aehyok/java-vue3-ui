@@ -58,7 +58,7 @@ const { locale, translationCh, translationEn } = useTranslationLang();
 
 const ruleForm = reactive({
   username: "admin",
-  password: "admin123",
+  password: "123456",
   verifyCode: ""
 });
 
@@ -222,7 +222,7 @@ watch(loginDay, value => {
                   clearable
                   :placeholder="t('login.pureVerifyCode')"
                   :prefix-icon="useRenderIcon('ri:shield-keyhole-line')"
-                > 
+                >
                   <template v-slot:append>
                     <ReImageVerify v-model:code="imgCode" />
                   </template>
@@ -297,7 +297,7 @@ watch(loginDay, value => {
             </Motion>
           </el-form>
 
-          <Motion v-if="currentPage === 0" :delay="350">
+          <!-- <Motion v-if="currentPage === 0" :delay="350">
             <el-form-item>
               <el-divider>
                 <p class="text-gray-500 text-xs">
@@ -318,7 +318,7 @@ watch(loginDay, value => {
                 </span>
               </div>
             </el-form-item>
-          </Motion>
+          </Motion> -->
           <!-- 手机号登录 -->
           <LoginPhone v-if="currentPage === 1" />
           <!-- 二维码登录 -->

@@ -13,6 +13,8 @@ import {
   getLogin,
   refreshTokenApi
 } from "@/api/user";
+
+import { postLogin } from "@/api/api";
 import { useMultiTagsStoreHook } from "./multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
 
@@ -71,8 +73,9 @@ export const useUserStore = defineStore({
     },
     /** 登入 */
     async loginByUsername(data) {
+      console.log("loginByUsername,,,,,,,", data);
       return new Promise<UserResult>((resolve, reject) => {
-        getLogin(data)
+        postLogin(data)
           .then(data => {
             if (data?.success) setToken(data.data);
             resolve(data);
