@@ -57,9 +57,10 @@ const { title, getDropdownItemStyle, getDropdownItemClass } = useNav();
 const { locale, translationCh, translationEn } = useTranslationLang();
 
 const ruleForm = reactive({
-  username: "admin",
-  password: "123456",
-  verifyCode: ""
+  userName: "admin",
+  password: "admin123456!",
+  verifyCode: "",
+  verifyKey: ""
 });
 
 const onLogin = async (formEl: FormInstance | undefined) => {
@@ -68,9 +69,15 @@ const onLogin = async (formEl: FormInstance | undefined) => {
     if (valid) {
       loading.value = true;
       useUserStoreHook()
-        .loginByUsername({ username: ruleForm.username, password: "admin123" })
+        .loginByUsername({
+          userName: ruleForm.userName,
+          password: ruleForm.password,
+          captcha: ruleForm.verifyCode,
+          captchaKey: ruleForm.verifyKey
+        })
         .then(res => {
-          if (res.success) {
+          console.log(res, "res-login");
+          if (res.code === 200) {
             // 获取后端路由
             return initRouter().then(() => {
               disabled.value = true;
@@ -82,7 +89,8 @@ const onLogin = async (formEl: FormInstance | undefined) => {
                 .finally(() => (disabled.value = false));
             });
           } else {
-            message(t("login.pureLoginFail"), { type: "error" });
+            // message(t("login.pureLoginFail"), { type: "error" });
+            message(res.message, { type: "error" });
           }
         })
         .finally(() => (loading.value = false));
@@ -192,10 +200,10 @@ watch(loginDay, value => {
                     trigger: 'blur'
                   }
                 ]"
-                prop="username"
+                prop="userName"
               >
                 <el-input
-                  v-model="ruleForm.username"
+                  v-model="ruleForm.userName"
                   clearable
                   :placeholder="t('login.pureUsername')"
                   :prefix-icon="useRenderIcon(User)"
@@ -224,7 +232,10 @@ watch(loginDay, value => {
                   :prefix-icon="useRenderIcon('ri:shield-keyhole-line')"
                 >
                   <template v-slot:append>
-                    <ReImageVerify v-model:code="imgCode" />
+                    <ReImageVerify
+                      v-model:code="imgCode"
+                      v-model:verifyKey="ruleForm.verifyKey"
+                    />
                   </template>
                 </el-input>
               </el-form-item>

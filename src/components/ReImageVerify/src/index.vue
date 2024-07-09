@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { watch } from "vue";
 import { useImageVerify } from "./hooks";
+import { verify } from "crypto";
 
 defineOptions({
   name: "ReImageVerify"
@@ -8,10 +9,12 @@ defineOptions({
 
 interface Props {
   code?: string;
+  verifyKey?: string;
 }
 
 interface Emits {
   (e: "update:code", code: string): void;
+  (e: "update:verifyKey", key: string): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,16 +23,20 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>();
 
-const { domRef, imgCode, setImgCode, getImgCode } = useImageVerify();
+const { domRef, imgCode, captchaKey, setImgCode, getImgCode } =
+  useImageVerify();
 
 watch(
   () => props.code,
   newValue => {
     setImgCode(newValue);
+    console.log(captchaKey, "verifyKey.value-------------");
   }
 );
 watch(imgCode, newValue => {
   emit("update:code", newValue);
+  console.log(captchaKey, "verifyKey.value-------------");
+  emit("update:verifyKey", captchaKey.value);
 });
 
 defineExpose({ getImgCode });

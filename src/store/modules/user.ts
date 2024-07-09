@@ -76,8 +76,12 @@ export const useUserStore = defineStore({
       console.log("loginByUsername,,,,,,,", data);
       return new Promise<UserResult>((resolve, reject) => {
         postLogin(data)
-          .then(data => {
-            if (data?.success) setToken(data.data);
+          .then((data: any) => {
+            if (data.data) {
+              data.data.username = data.data.userName;
+              data.data.roles = ["admin"];
+              setToken(data.data);
+            }
             resolve(data);
           })
           .catch(error => {

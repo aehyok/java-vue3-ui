@@ -8,6 +8,7 @@ import { getCaptcha } from "@/api/api";
 export const useImageVerify = (width = 120, height = 40) => {
   const domRef = ref<HTMLCanvasElement>();
   const imgCode = ref("");
+  const verifyKey = ref("");
 
   function setImgCode(code: string) {
     imgCode.value = code;
@@ -22,11 +23,13 @@ export const useImageVerify = (width = 120, height = 40) => {
       const ctx = domRef.value.getContext("2d");
       if (!ctx) return imgCode;
       var image = new Image();
-      image.src = res.data.captcha;
 
+      image.src = res.data.captcha;
+      verifyKey.value = res.data.key;
       image.onload = function () {
         ctx.drawImage(image, 0, 0);
       };
+      imgCode.value = res.data.key;
     });
   }
 
@@ -37,6 +40,7 @@ export const useImageVerify = (width = 120, height = 40) => {
   return {
     domRef,
     imgCode,
+    captchaKey: verifyKey,
     setImgCode,
     getImgCode
   };
