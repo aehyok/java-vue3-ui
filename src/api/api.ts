@@ -1,11 +1,11 @@
 import { http } from "@/utils/http";
 
 export const getCaptcha = () => {
-  return http.get("/api/user/captcha");
+  return http.get("/dev/apis/user/captcha");
 };
 
 export const postLogin = data => {
-  return http.request("post", "/api/user/login", { data });
+  return http.request("post", "/dev/apis/user/login", { data });
 };
 
 /**
@@ -13,7 +13,7 @@ export const postLogin = data => {
  * @returns
  */
 export const getDeptList = () => {
-  return http.request("get", "/api/dept");
+  return http.request("get", "/dev/apis/dept");
 };
 
 /**
@@ -22,7 +22,7 @@ export const getDeptList = () => {
  * @returns
  */
 export const deleteDept = id => {
-  return http.request("delete", `/api/dept/${id}`);
+  return http.request("delete", `/dev/apis/dept/${id}`);
 };
 
 /**
@@ -31,7 +31,7 @@ export const deleteDept = id => {
  * @returns
  */
 export const postDept = dept => {
-  return http.request("post", `/api/dept`, { data: dept });
+  return http.request("post", `/dev/api/dept`, { data: dept });
 };
 
 /**
@@ -40,5 +40,5 @@ export const postDept = dept => {
  * @returns
  */
 export const putDept = (id, dept) => {
-  return http.request("put", `/dev/api/dept/${id}`, { data: dept });
+  return http.request("put", `/dev/apis/dept/${id}`, { data: dept });
 };
