@@ -9,7 +9,8 @@ import { addDialog } from "@/components/ReDialog";
 import type { FormItemProps } from "../utils/types";
 import type { PaginationProps } from "@pureadmin/table";
 import { getKeyList, deviceDetection } from "@pureadmin/utils";
-import { getRoleList, getRoleMenu, getRoleMenuIds } from "@/api/system";
+import { getRoleMenu, getRoleMenuIds } from "@/api/system";
+import { getRoleList, postRole, putRole, deleteRole } from "@/api/api";
 import { type Ref, reactive, ref, onMounted, h, toRaw, watch } from "vue";
 
 export function useRole(treeRef: Ref) {
@@ -144,7 +145,8 @@ export function useRole(treeRef: Ref) {
       });
   }
 
-  function handleDelete(row) {
+  async function handleDelete(row) {
+    await deleteRole(row.id);
     message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
     onSearch();
   }
@@ -163,11 +165,11 @@ export function useRole(treeRef: Ref) {
 
   async function onSearch() {
     loading.value = true;
-    const { data } = await getRoleList(toRaw(form));
-    dataList.value = data.list;
-    pagination.total = data.total;
-    pagination.pageSize = data.pageSize;
-    pagination.currentPage = data.currentPage;
+    var result: any = await getRoleList(toRaw(form));
+    dataList.value = result.data;
+    pagination.total = result.total;
+    pagination.pageSize = result.limit;
+    pagination.currentPage = result.page;
 
     setTimeout(() => {
       loading.value = false;
@@ -206,15 +208,17 @@ export function useRole(treeRef: Ref) {
           done(); // 关闭弹框
           onSearch(); // 刷新表格数据
         }
-        FormRef.validate(valid => {
+        FormRef.validate(async valid => {
           if (valid) {
             console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
+              await postRole(curData);
               chores();
             } else {
               // 实际开发先调用修改接口，再进行下面操作
+              await putRole(row.id, curData);
               chores();
             }
           }
