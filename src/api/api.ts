@@ -112,3 +112,23 @@ export const putMenu = (id, data) => {
 export const deleteMenu = id => {
   return http.request("delete", `/dev/apis/menu/${id}`);
 };
+
+/**
+ *当前角色下权限管理列表
+ * @returns
+ */
+export const getPermissionList = roleId => {
+  return http.request("get", `/dev/apis/permission/${roleId}`);
+};
+
+/**
+ * 根据角色Id保存权限列表
+ * @param roleId
+ * @param permissionList
+ * @returns
+ */
+export const postPermissionList = (roleId, permissionList) => {
+  return http.request("post", `/dev/apis/permission/${roleId}`, {
+    data: permissionList
+  });
+};

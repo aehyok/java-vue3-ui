@@ -9,8 +9,15 @@ import { addDialog } from "@/components/ReDialog";
 import type { FormItemProps } from "../utils/types";
 import type { PaginationProps } from "@pureadmin/table";
 import { getKeyList, deviceDetection } from "@pureadmin/utils";
+import { getMenuList, postPermissionList } from "@/api/api";
 import { getRoleMenu, getRoleMenuIds } from "@/api/system";
-import { getRoleList, postRole, putRole, deleteRole } from "@/api/api";
+import {
+  getRoleList,
+  postRole,
+  putRole,
+  deleteRole,
+  getPermissionList
+} from "@/api/api";
 import { type Ref, reactive, ref, onMounted, h, toRaw, watch } from "vue";
 
 export function useRole(treeRef: Ref) {
@@ -230,10 +237,12 @@ export function useRole(treeRef: Ref) {
   /** 菜单权限 */
   async function handleMenu(row?: any) {
     const { id } = row;
+
+    console.log(row, id, "caidanquanxian");
     if (id) {
       curRow.value = row;
       isShow.value = true;
-      const { data } = await getRoleMenuIds({ id });
+      const { data } = await getPermissionList(id);
       treeRef.value.setCheckedKeys(data);
     } else {
       curRow.value = null;
@@ -250,10 +259,19 @@ export function useRole(treeRef: Ref) {
   }
 
   /** 菜单权限-保存 */
-  function handleSave() {
+  async function handleSave() {
     const { id, name } = curRow.value;
     // 根据用户 id 调用实际项目中菜单权限修改接口
-    console.log(id, treeRef.value.getCheckedKeys());
+
+    var list = treeRef.value.getCheckedKeys();
+    if (list.length === 0) {
+      message(`请先勾选权限`, {
+        type: "warning"
+      });
+    }
+
+    console.log(id);
+    await postPermissionList(id, treeRef.value.getCheckedKeys());
     message(`角色名称为${name}的菜单权限修改成功`, {
       type: "success"
     });
@@ -272,9 +290,19 @@ export function useRole(treeRef: Ref) {
 
   onMounted(async () => {
     onSearch();
-    const { data } = await getRoleMenu();
-    treeIds.value = getKeyList(data, "id");
-    treeData.value = handleTree(data);
+    // const { data } = await getRoleMenu();
+
+    const result: any = await getMenuList();
+    console.log(result, "result-----menu0-right");
+    const array = result.data.map(item => ({
+      id: item.id,
+      title: item.title,
+      parentId: item.parentId,
+      menuType: item.menuType
+    }));
+    console.log(array, "mneu------right");
+    treeIds.value = getKeyList(array, "id");
+    treeData.value = handleTree(array);
   });
 
   watch(isExpandAll, val => {

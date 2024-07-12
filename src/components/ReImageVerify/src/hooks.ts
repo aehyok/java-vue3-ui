@@ -17,19 +17,20 @@ export const useImageVerify = (width = 120, height = 40) => {
   function getImgCode() {
     if (!domRef.value) return;
     // imgCode.value = draw(domRef.value, width, height);
-    getCaptcha().then(res => {
+    getCaptcha().then((res: any) => {
       console.log(res, "getImgCode");
 
+      const result = res.data as any;
       const ctx = domRef.value.getContext("2d");
       if (!ctx) return imgCode;
       var image = new Image();
 
-      image.src = res.data.captcha;
-      verifyKey.value = res.data.key;
+      image.src = result.captcha;
+      verifyKey.value = result.key;
       image.onload = function () {
         ctx.drawImage(image, 0, 0);
       };
-      imgCode.value = res.data.key;
+      imgCode.value = result.key;
     });
   }
 
