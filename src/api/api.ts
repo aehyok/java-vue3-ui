@@ -77,3 +77,38 @@ export const putRole = (id, data) => {
 export const deleteRole = id => {
   return http.request("delete", `/dev/apis/role/${id}`);
 };
+
+/**
+ *菜单管理列表
+ * @returns
+ */
+export const getMenuList = () => {
+  return http.request("get", "/dev/apis/menu");
+};
+
+/**
+ * 新增菜单信息
+ * @param data
+ * @returns
+ */
+export const postMenu = data => {
+  return http.request("post", "/dev/apis/menu", { data });
+};
+
+/**
+ * 修改菜单信息
+ * @param data
+ * @returns
+ */
+export const putMenu = (id, data) => {
+  return http.request("put", `/dev/apis/menu/${id}`, { data });
+};
+
+/**
+ * 删除菜单信息
+ * @param data
+ * @returns
+ */
+export const deleteMenu = id => {
+  return http.request("delete", `/dev/apis/menu/${id}`);
+};
