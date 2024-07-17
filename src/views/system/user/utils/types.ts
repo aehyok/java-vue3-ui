@@ -4,17 +4,18 @@ interface FormItemProps {
   title: string;
   higherDeptOptions: Record<string, unknown>[];
   parentId: number;
-  nickname: string;
-  username: string;
+  nickName: string;
+  userName: string;
   password: string;
   phone: string | number;
   email: string;
   sex: string | number;
   status: number;
-  dept?: {
-    id?: number;
-    name?: string;
-  };
+  // dept?: {
+  //   id?: number;
+  //   name?: string;
+  // };
+  deptId: number;
   remark: string;
 }
 interface FormProps {
@@ -22,8 +23,8 @@ interface FormProps {
 }
 
 interface RoleFormItemProps {
-  username: string;
-  nickname: string;
+  userName: string;
+  nickName: string;
   /** 角色列表 */
   roleOptions: any[];
   /** 选中的角色列表 */

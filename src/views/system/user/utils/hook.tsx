@@ -11,13 +11,15 @@ import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
 import ReCropperPreview from "@/components/ReCropperPreview";
 import type { FormItemProps, RoleFormItemProps } from "../utils/types";
+import { postUser, putUser, deleteUser, postUserRole } from "@/api/api";
 import {
   getKeyList,
   isAllEmpty,
   hideTextAtIndex,
   deviceDetection
 } from "@pureadmin/utils";
-import { getRoleIds, getUserList, getAllRoleList } from "@/api/system";
+import { getRoleIds, getAllRole } from "@/api/api";
+import { getUserList } from "@/api/api";
 
 import { getDeptList } from "@/api/api";
 
@@ -42,8 +44,8 @@ import {
 export function useUser(tableRef: Ref, treeRef: Ref) {
   const form = reactive({
     // 左侧部门树的id
-    deptId: "",
-    username: "",
+    deptId: 0,
+    userName: "",
     phone: "",
     status: ""
   });
@@ -93,12 +95,12 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     },
     {
       label: "用户名称",
-      prop: "username",
+      prop: "userName",
       minWidth: 130
     },
     {
       label: "用户昵称",
-      prop: "nickname",
+      prop: "nickName",
       minWidth: 130
     },
     {
@@ -188,7 +190,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       `确认要<strong>${
         row.status === 0 ? "停用" : "启用"
       }</strong><strong style='color:var(--el-color-primary)'>${
-        row.username
+        row.userName
       }</strong>用户吗?`,
       "系统提示",
       {
@@ -229,7 +231,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     console.log(row);
   }
 
-  function handleDelete(row) {
+  async function handleDelete(row) {
+    await deleteUser(row.id);
     message(`您删除了用户编号为${row.id}的这条数据`, { type: "success" });
     onSearch();
   }
@@ -270,11 +273,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
 
   async function onSearch() {
     loading.value = true;
-    const { data } = await getUserList(toRaw(form));
-    dataList.value = data.list;
-    pagination.total = data.total;
-    pagination.pageSize = data.pageSize;
-    pagination.currentPage = data.currentPage;
+    console.log(toRaw(form), "搜索条件");
+
+    const result: any = await getUserList(toRaw(form));
+    console.log(result, "用户列表");
+    dataList.value = result.data;
+    pagination.total = result.total;
+    pagination.pageSize = result.pageSize;
+    pagination.currentPage = result.page;
 
     setTimeout(() => {
       loading.value = false;
@@ -284,7 +290,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const resetForm = formEl => {
     if (!formEl) return;
     formEl.resetFields();
-    form.deptId = "";
+    form.deptId = 0;
     treeRef.value.onTreeReset();
     onSearch();
   };
@@ -313,15 +319,15 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         formInline: {
           title,
           higherDeptOptions: formatHigherDeptOptions(higherDeptOptions.value),
-          parentId: row?.dept.id ?? 0,
-          nickname: row?.nickname ?? "",
-          username: row?.username ?? "",
+          nickName: row?.nickName ?? "",
+          userName: row?.userName ?? "",
           password: row?.password ?? "",
           phone: row?.phone ?? "",
           email: row?.email ?? "",
           sex: row?.sex ?? "",
           status: row?.status ?? 1,
-          remark: row?.remark ?? ""
+          remark: row?.remark ?? "",
+          deptId: form.deptId
         }
       },
       width: "46%",
@@ -334,21 +340,23 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
         function chores() {
-          message(`您${title}了用户名称为${curData.username}的这条数据`, {
+          message(`您${title}了用户名称为${curData.userName}的这条数据`, {
             type: "success"
           });
           done(); // 关闭弹框
           onSearch(); // 刷新表格数据
         }
-        FormRef.validate(valid => {
+        FormRef.validate(async valid => {
           if (valid) {
             console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
+              await postUser(curData);
               chores();
             } else {
               // 实际开发先调用修改接口，再进行下面操作
+              await putUser(row.id, curData);
               chores();
             }
           }
@@ -390,7 +398,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   /** 重置密码 */
   function handleReset(row) {
     addDialog({
-      title: `重置 ${row.username} 用户的密码`,
+      title: `重置 ${row.userName} 用户的密码`,
       width: "30%",
       draggable: true,
       closeOnClickModal: false,
@@ -448,7 +456,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         ruleFormRef.value.validate(valid => {
           if (valid) {
             // 表单规则校验通过
-            message(`已成功重置 ${row.username} 用户的密码`, {
+            message(`已成功重置 ${row.userName} 用户的密码`, {
               type: "success"
             });
             console.log(pwdForm.newPwd);
@@ -464,13 +472,18 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   /** 分配角色 */
   async function handleRole(row) {
     // 选中的角色列表
-    const ids = (await getRoleIds({ userId: row.id })).data ?? [];
+    var roles: any = await getRoleIds(row.id);
+    var ids = [];
+    if (roles && roles.data && roles.data.length > 0) {
+      ids = roles.data.map(role => role.roleId);
+    }
+
     addDialog({
-      title: `分配 ${row.username} 用户的角色`,
+      title: `分配 ${row.userName} 用户的角色`,
       props: {
         formInline: {
-          username: row?.username ?? "",
-          nickname: row?.nickname ?? "",
+          userName: row?.userName ?? "",
+          nickName: row?.nickName ?? "",
           roleOptions: roleOptions.value ?? [],
           ids
         }
@@ -481,10 +494,11 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       fullscreenIcon: true,
       closeOnClickModal: false,
       contentRenderer: () => h(roleForm),
-      beforeSure: (done, { options }) => {
+      beforeSure: async (done, { options }) => {
         const curData = options.props.formInline as RoleFormItemProps;
         console.log("curIds", curData.ids);
         // 根据实际业务使用curData.ids和row里的某些字段去调用修改角色接口即可
+        await postUserRole(row.id, curData.ids);
         done(); // 关闭弹框
       }
     });
@@ -501,7 +515,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     treeLoading.value = false;
 
     // 角色列表
-    roleOptions.value = (await getAllRoleList()).data;
+    roleOptions.value = (await getAllRole()).data;
   });
 
   return {

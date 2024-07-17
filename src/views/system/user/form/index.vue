@@ -10,13 +10,14 @@ const props = withDefaults(defineProps<FormProps>(), {
     title: "新增",
     higherDeptOptions: [],
     parentId: 0,
-    nickname: "",
-    username: "",
+    nickName: "",
+    userName: "",
     password: "",
     phone: "",
     email: "",
     sex: "",
     status: 1,
+    deptId: 0,
     remark: ""
   })
 });
@@ -53,7 +54,7 @@ defineExpose({ getRef });
       <re-col :value="12" :xs="24" :sm="24">
         <el-form-item label="用户昵称" prop="nickname">
           <el-input
-            v-model="newFormInline.nickname"
+            v-model="newFormInline.nickName"
             clearable
             placeholder="请输入用户昵称"
           />
@@ -62,7 +63,7 @@ defineExpose({ getRef });
       <re-col :value="12" :xs="24" :sm="24">
         <el-form-item label="用户名称" prop="username">
           <el-input
-            v-model="newFormInline.username"
+            v-model="newFormInline.userName"
             clearable
             placeholder="请输入用户名称"
           />
@@ -123,7 +124,7 @@ defineExpose({ getRef });
       <re-col :value="12" :xs="24" :sm="24">
         <el-form-item label="归属部门">
           <el-cascader
-            v-model="newFormInline.parentId"
+            v-model="newFormInline.deptId"
             class="w-full"
             :options="newFormInline.higherDeptOptions"
             :props="{

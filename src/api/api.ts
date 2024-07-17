@@ -132,3 +132,57 @@ export const postPermissionList = (roleId, permissionList) => {
     data: permissionList
   });
 };
+
+/**
+ *用户管理列表
+ * @returns
+ */
+export const getUserList = (data?: object) => {
+  return http.request("get", "/dev/apis/user", { params: data });
+};
+
+/**
+ * 新增用户信息
+ * @param data
+ * @returns
+ */
+export const postUser = data => {
+  return http.request("post", "/dev/apis/user", { data });
+};
+
+/**
+ * 修改用户信息
+ * @param data
+ * @returns
+ */
+export const putUser = (id, data) => {
+  return http.request("put", `/dev/apis/user/${id}`, { data: data });
+};
+
+/**
+ * 删除用户信息
+ * @param data
+ * @returns
+ */
+export const deleteUser = id => {
+  return http.request("delete", `/dev/apis/user/${id}`);
+};
+
+/**
+ * 给用户分配角色
+ * @param data
+ * @returns
+ */
+export const postUserRole = (userId, data) => {
+  return http.request("post", `/dev/apis/user/role/${userId}`, { data });
+};
+
+/** 系统管理-用户管理-根据userId，获取对应角色id列表（userId：用户id） */
+export const getRoleIds = userId => {
+  return http.request("get", `/dev/apis/user/role/${userId}`);
+};
+
+/** 获取系统管理-所有角色管理列表 */
+export const getAllRole = () => {
+  return http.request("get", "/dev/apis/role/all");
+};
