@@ -48,6 +48,15 @@ const systemManagementRouter = {
         title: "menus.pureDept",
         roles: ["admin"]
       }
+    },
+    {
+      path: "/system/dictionary/index",
+      name: "SystemDictionary",
+      meta: {
+        icon: "ri:git-branch-line",
+        title: "menus.pureSystemDictionary",
+        roles: ["admin"]
+      }
     }
   ]
 };

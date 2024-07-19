@@ -75,7 +75,7 @@ const onLogin = async (formEl: FormInstance | undefined) => {
           captcha: ruleForm.verifyCode,
           captchaKey: ruleForm.verifyKey
         })
-        .then(res => {
+        .then((res: any) => {
           console.log(res, "res-login");
           if (res.code === 200) {
             // 获取后端路由
